@@ -1,38 +1,44 @@
 # CronPilot
 
-**Know when it actually runs.** An accessible, browser-based cron preview tool by [Ahmad Yar](https://www.ahmadyar.co/).
+**Know when it actually runs.** An open-source cron preview and timezone comparison workbench by [Ahmad Yar](https://www.ahmadyar.co/).
 
-CronPilot translates standard **five-field cron** expressions into upcoming execution timestamps for a selected IANA timezone, detects timezone offset changes in the displayed results, and highlights daylight-saving pitfalls. It does not execute scheduled tasks.
+**Live:** https://cronpilot-three.vercel.app/ · **Source:** https://github.com/ahamdjin/cronpilot
 
-## Run locally
+## Why developers use it
 
-Node.js 20+:
+A cron expression can mean something different in UTC, New York, and Karachi. CronPilot gives you an explicit scheduler time zone, upcoming UTC instants, optional secondary timezone comparisons, clear explanations for common expressions, warning notes about DST pitfalls, reproducible share links and a CSV suitable for release/incident reviews.
 
-    npm install
-    npm run dev
+- Five-field Linux-style cron previews using [cron-parser](https://github.com/harrisiirak/cron-parser) (MIT).
+- Select the scheduler's IANA timezone; supported IANA zones are populated where the browser supports `Intl.supportedValuesOf`.
+- Preview 8, 12 or 20 occurrences, inspect local wall-clock and exact UTC timestamps.
+- Compare **the same UTC instants** in a second timezone, not a second independent schedule.
+- Highlight offset changes in the displayed run horizon and call out common ambiguity cases (2 AM, day/month overlap, limited months).
+- Share the selected expression, timezones and **fixed ISO start instant** as a link, or export a CSV for handoff.
+- Browser-only calculations; no account, backend, scheduling execution or telemetry in this app.
 
-Open the local URL printed by Vite. For production: `npm run build` and deploy the `dist/` directory to a static host (including Vercel).
+## Get started
 
-## Test
+Node 20+:
 
-    npm test
-    npm run build
+```sh
+npm install
+npm test
+npm run build
+npm run dev
+```
 
-## Why it exists
+The static `dist/` output can be hosted with Vercel or another static host. Install and build from the repository to verify third-party dependencies.
 
-A cron expression that looks obvious can mean a different instant in New York, Karachi or London. Unlike naive UTC converters, CronPilot asks for the **scheduler's timezone** and renders both local execution timestamps and UTC instants.
+## Limitations
 
-- Five-field cron only; six-field / Quartz syntax is intentionally rejected.
-- Upcoming scheduled instants are calculated using [cron-parser](https://github.com/harrisiirak/cron-parser) and its timezone-aware iterator.
-- Displays timezone offset changes among the selected preview rows. This does not exhaustively detect every possible DST edge case.
-- Uses the browser's local clock as the default starting instant, while explicit overrides must have an ISO timestamp with timezone.
-- Your cron input is processed locally in the browser; no backend, login or telemetry in the app itself.
+CronPilot predicts calendar occurrences and **does not execute jobs**. It is not a guaranteed representation of Vixie cron, Kubernetes CronJobs, Quartz, GitHub Actions, EventBridge or arbitrary workflow runners. Those systems can differ on day-of-month/day-of-week matching, DST, unsupported tokens, retries, skipped executions and concurrency.
 
-**Scheduler semantics vary.** Some cron implementations differ in day-of-month vs weekday matching, unsupported tokens, DST behavior and execution guarantees. Verify your production scheduler.
+The app intentionally requires **five fields** (minute, hour, day, month, weekday); six-field expressions are rejected. Start timestamps require explicit timezone offsets. DST warnings are advisory and limited to the displayed execution horizon. Natural-language explanations target common patterns; other expressions are shown field-by-field rather than claiming a complete semantic translation.
 
-## Foundation and license
+## Attribution
 
-- [cron-parser](https://github.com/harrisiirak/cron-parser) (MIT): parser, calendar iteration, timezone support. Used as a dependency, not copied.
-- Original UI and tests by Ahmad Yar. Project source licensed MIT; dependency licenses remain with their authors.
+Parsing and timezone calendar iteration use **cron-parser** (MIT), credited to its maintainers. The application UI, sharing workflow, CSV export and tests are original MIT-licensed work by Ahmad Yar.
 
-Status: functional MVP source. Build and test on your machine/CI before distribution; not yet announced as launched.
+## Quality
+
+`npm run build` runs unit tests first. GitHub Actions runs test/build for pushes and pull requests. Review production scheduler semantics before changing a real job.

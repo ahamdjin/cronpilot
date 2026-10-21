@@ -1,0 +1,46 @@
+import {test,expect} from '@playwright/test';
+import {readFile} from 'node:fs/promises';
+test('preview, secondary timezone, CSV and fixed share link work',async({page,context})=>{
+ await page.goto('/');
+ await page.locator('#timezone').selectOption('Asia/Karachi');
+ await page.locator('#compare-zone').selectOption('America/New_York');
+ await page.locator('#from').fill('2026-10-22T00:00:00Z');
+ await page.locator('#expression').fill('0 9 * * 1-5');
+ await page.getByRole('button',{name:/Preview schedule/}).click();
+ await expect(page.locator('#runs li')).toHaveCount(8);
+ await expect(page.locator('#explain')).toContainText('Monday');
+ await expect(page.locator('.compare-time').first()).toContainText('America/New_York');
+ const dl=page.waitForEvent('download');
+ await page.locator('#export-csv').click();
+ const item=await dl;
+ expect(item.suggestedFilename()).toBe('cronpilot-schedule.csv');
+ const csv=await readFile(await item.path(),'utf8');
+ expect(csv).toContain('America/New_York');
+ await context.grantPermissions(['clipboard-read','clipboard-write']);
+ await page.locator('#copy-link').click();
+ const url=await page.evaluate(()=>navigator.clipboard.readText());
+ expect(url).toContain('cron=');
+ await page.goto(url);
+ await expect(page.locator('#timezone')).toHaveValue('Asia/Karachi');
+ await expect(page.locator('#from')).toHaveValue('2026-10-22T00:00:00Z');
+ await expect(page.locator('#runs li')).toHaveCount(8);
+});
+test('DST warnings and invalid start timestamps are shown clearly',async({page})=>{
+ await page.goto('/');
+ await page.locator('#expression').fill('0 2 * * *');
+ await page.locator('#timezone').selectOption('America/New_York');
+ await page.locator('#from').fill('2027-03-12T00:00:00Z');
+ await page.getByRole('button',{name:/Preview schedule/}).click();
+ await expect(page.locator('#warnings')).toContainText('DST');
+ await expect(page.locator('#status')).toContainText('offset changes');
+ await page.locator('#from').fill('2027-03-12T02:00:00');
+ await page.getByRole('button',{name:/Preview schedule/}).click();
+ await expect(page.locator('#status')).toContainText('explicit timezone');
+});
+test('mobile input and upcoming execution table fit in viewport',async({page})=>{
+ await page.setViewportSize({width:375,height:812});
+ await page.goto('/');
+ await expect(page.locator('#runs li')).toHaveCount(8);
+ const sizes=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,width:window.innerWidth}));
+ expect(sizes.scroll).toBeLessThanOrEqual(sizes.width+1);
+});

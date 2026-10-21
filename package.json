@@ -1,6 +1,6 @@
 {
   "name": "cronpilot",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "Timezone-aware cron schedule preview, powered by cron-parser",
@@ -8,9 +8,17 @@
     "dev": "vite --host 0.0.0.0",
     "build": "npm test && vite build",
     "preview": "vite preview",
-    "test": "node --test"
+    "test": "node --test",
+    "test:e2e": "playwright test"
   },
-  "dependencies": {"cron-parser": "^5.10.2"},
-  "devDependencies": {"vite": "^7.3.0"},
-  "engines": {"node": ">=20"}
+  "dependencies": {
+    "cron-parser": "^5.10.2"
+  },
+  "devDependencies": {
+    "vite": "^7.3.0",
+    "@playwright/test": "^1.56.1"
+  },
+  "engines": {
+    "node": "22.x"
+  }
 }
