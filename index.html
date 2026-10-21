@@ -9,7 +9,7 @@
 <main>
 <div class="eyebrow"><span class="dot"></span> Developer utility / 01</div>
 <h1>Know when it<br><em>actually runs.</em></h1>
-<p class="lead">Decode a cron expression, preview its next executions in any time zone, and spot daylight-saving changes before they become incidents.</p>
+<p class="lead">Decode a cron expression, preview its next executions in any time zone, and spot daylight-saving changes before they become incidents. Share a reproducible preview or export its UTC timestamps for incident reviews.</p>
 <div class="workspace">
 <section class="input-panel" aria-labelledby="config-title">
 <div class="panel-header"><span class="panel-kicker">01 / Configure</span><h2 id="config-title">Schedule input</h2></div>
@@ -20,13 +20,17 @@
 <p class="hint" id="cron-hint">Five fields, minute through weekday. This tool previews cron-parser semantics; individual schedulers may differ.</p>
 <div class="presets" aria-label="Example expressions"><button type="button" data-cron="0 9 * * 1-5">Weekdays at 09:00</button><button type="button" data-cron="*/15 * * * *">Every 15 min</button><button type="button" data-cron="30 2 * * *">Daily at 02:30</button></div>
 <div class="split"><div><label for="timezone">IANA time zone</label><select id="timezone"><option value="UTC">UTC</option><option value="America/New_York">New York</option><option value="America/Los_Angeles">Los Angeles</option><option value="Europe/London">London</option><option value="Europe/Berlin">Berlin</option><option value="Asia/Karachi">Karachi</option><option value="Asia/Tokyo">Tokyo</option><option value="Australia/Sydney">Sydney</option></select></div><div><label for="count">Preview count</label><select id="count"><option value="8">8 executions</option><option value="12">12 executions</option><option value="20">20 executions</option></select></div></div>
-<label for="from">Start from <span class="muted">· optional, UTC ISO timestamp</span></label><input id="from" placeholder="2026-10-22T12:00:00Z" spellcheck="false">
+<label for="from">Start from <span class="muted">· optional, ISO timestamp with timezone</span></label><input id="from" placeholder="2026-10-22T12:00:00Z" spellcheck="false">
+<div class="share-options"><label for="compare-zone">Compare displayed instants in</label><select id="compare-zone"><option value="">No secondary timezone</option><option value="UTC">UTC</option><option value="America/New_York">New York</option><option value="Europe/London">London</option><option value="Asia/Karachi">Karachi</option><option value="Asia/Tokyo">Tokyo</option></select></div>
+<div class="utility-actions"><button id="copy-link" type="button">Copy shareable schedule link</button><button id="export-csv" type="button" disabled>Export CSV ↓</button></div>
 <button type="submit" class="primary">Preview schedule <span aria-hidden="true">↗</span></button>
 </form></section>
 <section class="results-panel" aria-labelledby="results-title">
 <div class="panel-header"><span class="panel-kicker">02 / Results</span><h2 id="results-title">Upcoming executions</h2></div>
+<div class="explanation"><small>SCHEDULE INTERPRETATION</small><strong id="explain">Schedule not calculated yet</strong><div id="warnings" class="warnings"></div></div>
 <div id="status" class="status" role="status" aria-live="polite"></div>
 <ol id="runs" class="run-list"></ol>
+<p id="compare-note" class="footnote" aria-live="polite"></p>
 <p class="footnote">Timezone offsets can change with daylight saving. Previewing future runs is not a guarantee of how every cron implementation schedules jobs.</p>
 </section>
 </div></main>
