@@ -14,7 +14,8 @@ export function previewSchedule(expression, options = {}) {
     weekday: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit',
     hour12: false, timeZoneName: 'shortOffset'
   });
-  const iterator = CronExpressionParser.parse(expr, { currentDate: from, tz: timezone, strict: true });
+  // cron-parser strict mode requires six fields; validate our five-field dialect above.
+  const iterator = CronExpressionParser.parse(expr, { currentDate: from, tz: timezone });
   const runs = [];
   for (let i = 0; i < count; i += 1) {
     const date = iterator.next().toDate();
